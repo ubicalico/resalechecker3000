@@ -9,7 +9,9 @@ This is the updated version since they release this new dataset recently. You ca
 - **requests** — as the name implies, it is used to request for the resource from data.gov.sg 
 - **pandas** — data cleaning, manipulation blah blah...
 - **SQLAlchemy** — my uni taught me this so i used this LOL
-- **Flask** — serves the web app
+- **Flask** — renders the web app (using Flask templates and HTML)
+- **uWSGI** - entry point to Flask app
+- **NGINX** - proxy between end user and uWSGI
 
 ## Setup
 
