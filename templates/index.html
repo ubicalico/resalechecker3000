@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resale Checker 3000</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Arial, sans-serif; margin: 0; background: #f5f6f8; color: #222; }
+    header { background: #88261f; color: #fff; padding: 14px 24px; }
+    header h1 { margin: 0; font-size: 1.25rem; }
+    header p { margin: 4px 0 0; font-size: 0.85rem; opacity: 0.85; }
+    main { padding: 16px 24px 40px; }
+
+    form.filters { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; }
+    .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px 14px; }
+    .filter-grid label { display: block; font-size: 0.75rem; font-weight: 600; color: #555; margin-bottom: 3px; }
+    .filter-grid select, .filter-grid input { width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 0.85rem; background: #fff; }
+    .pair { display: flex; gap: 6px; }
+    .buttons { margin-top: 12px; display: flex; gap: 8px; }
+    button, a.reset { padding: 7px 18px; border-radius: 5px; font-size: 0.85rem; cursor: pointer; text-decoration: none; }
+    button { background: #88261f; color: #fff; border: none; }
+    button:hover { background: #16295e; }
+    a.reset { background: #eee; color: #333; border: 1px solid #ccc; display: inline-block; }
+
+    .stats { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+    .stat { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 8px 16px; font-size: 0.8rem; color: #666; }
+    .stat b { display: block; font-size: 1.05rem; color: #88261f; margin-top: 2px; }
+
+    .table-wrap { overflow-x: auto; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.8rem; }
+    th, td { padding: 7px 10px; border-bottom: 1px solid #eee; text-align: left; white-space: nowrap; }
+    th { background: #f0f2f7; position: sticky; top: 0; }
+    th a { color: #88261f; text-decoration: none; }
+    th a:hover { text-decoration: underline; }
+    tr:hover td { background: #f8f9fc; }
+    td.r, th.r { text-align: right; }
+
+    .pagination { margin-top: 14px; display: flex; align-items: center; gap: 12px; font-size: 0.85rem; }
+    .pagination a { color: #88261f; text-decoration: none; padding: 5px 12px; border: 1px solid #ccc; border-radius: 5px; background: #fff; }
+    .pagination a:hover { background: #eef1f8; }
+    .pagination span.disabled { color: #aaa; padding: 5px 12px; border: 1px solid #e0e0e0; border-radius: 5px; }
+    .empty { padding: 30px; text-align: center; color: #777; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Singapore HDB Resale Transactions</h1>
+  <p>Resale flat prices from January 2017 onwards &middot; Source: data.gov.sg</p>
+</header>
+<main>
+
+  <form class="filters" method="get" action="{{ url_for('index') }}">
+    <div class="filter-grid">
+      <div>
+        <label>Month from</label>
+        <select name="month_from">
+          <option value="">Any</option>
+          {% for m in options.month %}<option value="{{ m }}" {% if request.args.get('month_from') == m %}selected{% endif %}>{{ m }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Month to</label>
+        <select name="month_to">
+          <option value="">Any</option>
+          {% for m in options.month %}<option value="{{ m }}" {% if request.args.get('month_to') == m %}selected{% endif %}>{{ m }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Town</label>
+        <select name="town">
+          <option value="">All</option>
+          {% for t in options.town %}<option value="{{ t }}" {% if request.args.get('town') == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Flat type</label>
+        <select name="flat_type">
+          <option value="">All</option>
+          {% for t in options.flat_type %}<option value="{{ t }}" {% if request.args.get('flat_type') == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Storey range</label>
+        <select name="storey_range">
+          <option value="">All</option>
+          {% for s in options.storey_range %}<option value="{{ s }}" {% if request.args.get('storey_range') == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Flat model</label>
+        <select name="flat_model">
+          <option value="">All</option>
+          {% for m in options.flat_model %}<option value="{{ m }}" {% if request.args.get('flat_model') == m %}selected{% endif %}>{{ m }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Block / street search</label>
+        <input type="text" name="search" placeholder="e.g. Ang Mo Kio Ave 3" value="{{ request.args.get('search', '') }}">
+      </div>
+      <div>
+        <label>Floor area (sqm)</label>
+        <div class="pair">
+          <input type="number" name="area_min" placeholder="min" value="{{ request.args.get('area_min', '') }}">
+          <input type="number" name="area_max" placeholder="max" value="{{ request.args.get('area_max', '') }}">
+        </div>
+      </div>
+      <div>
+        <label>Resale price (S$)</label>
+        <div class="pair">
+          <input type="number" name="price_min" placeholder="min" value="{{ request.args.get('price_min', '') }}">
+          <input type="number" name="price_max" placeholder="max" value="{{ request.args.get('price_max', '') }}">
+        </div>
+      </div>
+      <div>
+        <label>Lease commence year</label>
+        <div class="pair">
+          <input type="number" name="lease_min" placeholder="from" value="{{ request.args.get('lease_min', '') }}">
+          <input type="number" name="lease_max" placeholder="to" value="{{ request.args.get('lease_max', '') }}">
+        </div>
+      </div>
+      <div>
+        <label>Remaining lease (years)</label>
+        <div class="pair">
+          <input type="number" name="remaining_min" placeholder="min" value="{{ request.args.get('remaining_min', '') }}">
+          <input type="number" name="remaining_max" placeholder="max" value="{{ request.args.get('remaining_max', '') }}">
+        </div>
+      </div>
+    </div>
+    <div class="buttons">
+      <button type="submit">Apply filters</button>
+      <a class="reset" href="{{ url_for('index') }}">Reset</a>
+    </div>
+  </form>
+
+  <div class="stats">
+    <div class="stat">Transactions<b>{{ total | num }}</b></div>
+    <div class="stat">Average price<b>{% if stats.avg_price %}S$ {{ stats.avg_price | num }}{% else %}&ndash;{% endif %}</b></div>
+    <div class="stat">Lowest price<b>{% if stats.min_price %}S$ {{ stats.min_price | num }}{% else %}&ndash;{% endif %}</b></div>
+    <div class="stat">Highest price<b>{% if stats.max_price %}S$ {{ stats.max_price | num }}{% else %}&ndash;{% endif %}</b></div>
+    <div class="stat">Avg price / sqm<b>{% if stats.avg_psm %}S$ {{ stats.avg_psm | num }}{% else %}&ndash;{% endif %}</b></div>
+  </div>
+
+  {% macro th(col, label, right=false) -%}
+    <th {% if right %}class="r"{% endif %}>
+      <a href="{{ url_with(sort=col, order='asc' if sort == col and order == 'desc' else 'desc', page=1) }}">
+        {{ label }}{% if sort == col %} {{ '▲' if order == 'asc' else '▼' }}{% endif %}
+      </a>
+    </th>
+  {%- endmacro %}
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          {{ th('month', 'Month') }}
+          {{ th('town', 'Town') }}
+          {{ th('flat_type', 'Flat type') }}
+          {{ th('block', 'Block') }}
+          {{ th('street_name', 'Street') }}
+          {{ th('storey_range', 'Storey') }}
+          {{ th('floor_area_sqm', 'Area (sqm)', right=true) }}
+          {{ th('flat_model', 'Model') }}
+          {{ th('lease_commence_date', 'Lease start', right=true) }}
+          {{ th('remaining_lease_years', 'Remaining lease', right=true) }}
+          {{ th('resale_price', 'Resale price (S$)', right=true) }}
+          {{ th('price_per_sqm', 'Price / sqm (S$)', right=true) }}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td>{{ row.month }}</td>
+          <td>{{ row.town }}</td>
+          <td>{{ row.flat_type }}</td>
+          <td>{{ row.block }}</td>
+          <td>{{ row.street_name }}</td>
+          <td>{{ row.storey_range }}</td>
+          <td class="r">{{ row.floor_area_sqm | num(1) }}</td>
+          <td>{{ row.flat_model }}</td>
+          <td class="r">{{ row.lease_commence_date }}</td>
+          <td class="r">{{ row.remaining_lease }}</td>
+          <td class="r">{{ row.resale_price | num }}</td>
+          <td class="r">{{ row.price_per_sqm | num }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="12" class="empty">No transactions match the selected filters.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination">
+    {% if page > 1 %}<a href="{{ url_with(page=page - 1) }}">&larr; Previous</a>{% else %}<span class="disabled">&larr; Previous</span>{% endif %}
+    <span>Page {{ page | num }} of {{ pages | num }} ({{ total | num }} transactions)</span>
+    {% if page < pages %}<a href="{{ url_with(page=page + 1) }}">Next &rarr;</a>{% else %}<span class="disabled">Next &rarr;</span>{% endif %}
+  </div>
+
+</main>
+</body>
+</html>
