@@ -49,3 +49,6 @@ venv\Scripts\python data_loader.py
 "Why don't you run a node.js app?" This is meant to be lightweight and in a language that I fully comprehend. Have you ever tried debugging in JS?
 "Why don't you add some visualisations?" Procrastination.
 "data.gov.sg already has a data explorer, why I need to build my own with this?" You try that and let me know how that works out for you.
+
+## Disclaimer
+The project leverages information from data.gov.sg. Adhere to the [API limits](https://guide.data.gov.sg/developer-guide/api-overview/api-rate-limits) and use it responsibly. Don't let your AI agents poll it endlessly. Creating a publicly accessible on your local machine increases your surface area for malicious actors. Ensure you have the correct firewall configuration before running and exposing this application from your local machine. 
