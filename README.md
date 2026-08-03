@@ -2,7 +2,7 @@ A simple Flask web app for browsing, searching and filtering Singapore HDB
 resale flat transactions from January 2017 onwards, using data from
 [data.gov.sg](https://data.gov.sg/datasets/d_8b84c4ee58e3cfc0ece0d773c8ca6abc/view).
 
-This is the updated version since they release this new dataset recently
+This is the updated version since they release this new dataset recently. You can view the website live here: resale.hishamo.net
 
 ## Libraries used
 
@@ -51,4 +51,6 @@ venv\Scripts\python data_loader.py
 "data.gov.sg already has a data explorer, why I need to build my own with this?" You try that and let me know how that works out for you.
 
 ## Disclaimer
-The project leverages information from data.gov.sg. Adhere to the [API limits](https://guide.data.gov.sg/developer-guide/api-overview/api-rate-limits) and use it responsibly. Do not let your AI agents poll it endlessly. Creating a publicly accessible on your local machine increases your surface area for malicious actors. Ensure you have the correct firewall configuration before running and exposing this application from your local machine. The above scripts is applicable to a Windows environment. Code changes may be necessary for other OS-es.
+The project leverages information from data.gov.sg. Adhere to the [API limits](https://guide.data.gov.sg/developer-guide/api-overview/api-rate-limits) and use it responsibly. Do not let your AI agents poll it endlessly. 
+
+Creating a publicly accessible on your local machine increases your surface area for malicious actors. Ensure you have the correct firewall configuration before running and exposing this application from your local machine. The above scripts is applicable to a Windows environment. Code changes may be necessary for other OS-es. Use the "deploy-fork" branch if you want to deploy it to your own VM instance. 
