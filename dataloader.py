@@ -82,7 +82,7 @@ def ensure_data(engine):
         with engine.connect() as conn:
             count = conn.execute(text(f"SELECT COUNT(*) FROM {TABLE_NAME}")).scalar()
         if count:
-            print(f"Database ready ({count:,} rows). Run 'python data_loader.py' to refresh it.")
+            print(f"Database ready ({count:,} rows). Run 'python dataloader.py' to refresh it.")
             return
     load_data(engine)
 

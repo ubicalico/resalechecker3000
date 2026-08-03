@@ -1,0 +1,19 @@
+# systemd unit for the uWSGI server.
+# Install as: /etc/systemd/system/hdb-resale.service
+[Unit]
+Description=uWSGI server for the HDB resale Flask app
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/srv/hdb-resale-app
+# Creates /run/hdb-resale (owned by www-data) for the socket on every start
+RuntimeDirectory=hdb-resale
+ExecStart=/srv/hdb-resale-app/venv/bin/uwsgi --ini /srv/hdb-resale-app/deploy/uwsgi.ini
+Restart=always
+RestartSec=3
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target
