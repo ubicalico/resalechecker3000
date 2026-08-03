@@ -2,7 +2,7 @@ A simple Flask web app for browsing, searching and filtering Singapore HDB
 resale flat transactions from January 2017 onwards, using data from
 [data.gov.sg](https://data.gov.sg/datasets/d_8b84c4ee58e3cfc0ece0d773c8ca6abc/view).
 
-This is the updated version since they release this new dataset recently. You can view the website live here: resale.hishamo.net
+This is the updated version since they release this new dataset recently. You can view the website live here: [resale.hishamo.net](https://resale.hishamo.net)
 
 ## Libraries used
 
